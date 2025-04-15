@@ -13,13 +13,14 @@ const storage = new CloudinaryStorage({
     params: {
       folder: 'pdf-management-system/pdfs',
       resource_type: 'raw',
+      format: 'pdf', // Explicitly set format to PDF
       public_id: (req, file) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         const filename = file.originalname.split('.')[0];
         return `${filename}-${uniqueSuffix}`;
       }
     }
-  });
+  });;
 
   const fileFilter = (req, file, cb) => {
     if (file.mimetype === 'application/pdf') {

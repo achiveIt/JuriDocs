@@ -1,6 +1,7 @@
 import express from 'express'
 import cookieParser from 'cookie-parser';
-import authRoutes from './routes/authRoutes.js'
+import authRoutes from './routes/authRoutes.js';
+import pdfRoutes from './routes/pdfRoutes.js'
 import bodyParser from 'body-parser';
 import cors from 'cors'
 
@@ -14,5 +15,6 @@ app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', authRoutes);
+app.use('/api/pdf', pdfRoutes)
 
 export {app}
