@@ -1,4 +1,4 @@
-import PDF from '../models/pdfModel.js';
+import {PDF} from '../models/pdfModel.js';
 import { cloudinary } from '../config/cloudinary.js';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -17,14 +17,26 @@ export const uploadPDF = async (req, res) => {
         if (!req.file) {
             return res.status(400).json({ message: 'Please upload a PDF file' });
         }
+        //console.log("this is the user when uploading PDF", req.user);
+        
 
+        console.log("file ka path", req.file.path);
+        
         const newPDF = await PDF.create({
             title: req.body.title || req.file.originalname,
             fileName: req.file.originalname,
             cloudinaryId: req.file.filename,
-            cloudinaryUrl: req.file.path,
-            uploadedBy: req.user._id
+            cloudinaryUrl: cloudinary.url(req.file.path, {
+                resource_type: 'raw',
+                secure: true,
+                transformation: [
+                    { flags: `attachment:${req.file.originalname}` }
+                ],
+                  
+            }),
+            uploadedBy: req.user.id
         });
+        
 
         res.status(200).json(newPDF);
     } catch (error) {
