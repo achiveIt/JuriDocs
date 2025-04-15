@@ -6,8 +6,11 @@ import jwt from 'jsonwebtoken';
 const generateTokens = async (userId) => {
     try {
         const user = await User.findById(userId);
+        //console.log("user toh yae rha ", user);
+        
         const accessToken = user.generateAccessToken();
         const refreshToken = user.generateRefreshToken();
+        //console.log("reached line 13..");
         
         user.refreshToken = refreshToken;
         await user.save({ validateBeforeSave: false });
@@ -41,8 +44,6 @@ export const register = async (req, res) => {
             email,
             password
         });
-        
-        const { accessToken, refreshToken } = await generateTokens(user._id);
         
         const options = {
             httpOnly: true,
@@ -82,7 +83,7 @@ export const login = async (req, res) => {
                 .json(new ApiResponse(400, {}, "User not found"));
         }
         
-        const isPasswordValid = await user.isPasswordCorrect(password);
+        const isPasswordValid = await user.matchPassword(password);
         
         if (!isPasswordValid) {
             return res

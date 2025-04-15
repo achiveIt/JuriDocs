@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import jwt from "jsonwebtoken"
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -15,6 +16,9 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    refreshToken:{
+        type: String
+    },
     createdAt: {
         type: Date,
         default: Date.now
@@ -29,6 +33,7 @@ userSchema.pre('save', async function(next) {
   
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+  next()
 });
 
 userSchema.methods.matchPassword = async function(enteredPassword) {
