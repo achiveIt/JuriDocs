@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 export const getUserPDFs = async (req, res) => {
     try {
-        const pdfs = await PDF.find({ uploadedBy: req.user._id });
+        const pdfs = await PDF.find({ uploadedBy: req.user.id });
         res.status(200).json(pdfs);
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
@@ -53,12 +53,12 @@ export const getPDFById = async (req, res) => {
             return res.status(400).json({ message: 'PDF not found' });
         }
         
-        if (pdf.uploadedBy.toString() !== req.user._id.toString() && !pdf.sharedWith.includes(req.user._id)) {
+        if (pdf.uploadedBy.toString() !== req.user.id.toString() && !pdf.sharedWith.includes(req.user.id)) {
             return res.status(400).json({ message: 'Sorry you are not authorized to access this PDF' });
         }
         
         res.status(200).json({
-            id: pdf._id,
+            id: pdf.id,
             title: pdf.title,
             url: pdf.cloudinaryUrl,
             uploadedBy: pdf.uploadedBy,
@@ -78,13 +78,13 @@ export const deletePDF = async (req, res) => {
             return res.status(404).json({ message: 'PDF not found' });
         }
         
-        if (pdf.uploadedBy.toString() !== req.user._id.toString()) {
+        if (pdf.uploadedBy.toString() !== req.user.id.toString()) {
             return res.status(403).json({ message: 'You are not authorized to delete this PDF' });
         }
         
         await cloudinary.uploader.destroy(pdf.cloudinaryId, { resource_type: 'raw' });
         
-        await PDF.findByIdAndDelete(pdf._id);
+        await PDF.findByIdAndDelete(pdf.id);
         
         res.status(200).json({ message: 'PDF deleted successfully' });
     } catch (error) {
@@ -101,7 +101,7 @@ export const generateShareLink = async (req, res) => {
             return res.status(404).json({ message: 'PDF not found' });
         }
         
-        if (pdf.uploadedBy.toString() !== req.user._id.toString()) {
+        if (pdf.uploadedBy.toString() !== req.user.id.toString()) {
             return res.status(403).json({ message: 'You are not authorized to share this PDF' });
         }
         
@@ -129,7 +129,7 @@ export const getPDFByShareLink = async (req, res) => {
         
         res.status(200).json({
         pdf: {
-            id: pdf._id,
+            id: pdf.id,
             title: pdf.title,
             url: pdf.cloudinaryUrl,
             createdAt: pdf.createdAt
