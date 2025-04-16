@@ -1,5 +1,6 @@
-import Comment from '../models/commentModel.js';
-import PDF from '../models/pdfModel.js';
+import {Comment} from '../models/commentModel.js';
+import {PDF} from '../models/pdfModel.js';
+import { User } from '../models/userModel.js';
 import ApiError from '../utils/ApiError.js';
 import ApiResponse from '../utils/ApiResponse.js';
 
@@ -79,14 +80,16 @@ export const addComment = async (req, res, next) => {
         return next(new ApiError(400, "Parent comment does not belong to this PDF"));
       }
     }
-    
+
+    const userInfo = await User.findById(req.user.id)
+        
     const newComment = await Comment.create({
         pdfId,
         text,
         parentId: parentId || null,
         user: {
             id: req.user.id,
-            name: req.user.name,
+            name: userInfo.name,
             email: req.user.email
         }
     });
