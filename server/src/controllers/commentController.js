@@ -4,7 +4,29 @@ import { User } from '../models/userModel.js';
 import ApiError from '../utils/ApiError.js';
 import ApiResponse from '../utils/ApiResponse.js';
 
-export const getCommentsByPdfId = async (req, res, next) => {
+function buildCommentTree(comments) {
+    const commentMap = {};
+    const roots = [];
+
+    comments.forEach(comment => {
+        commentMap[comment._id] = { ...comment.toObject(), replies: [] };
+    });
+
+    comments.forEach(comment => {
+        if (comment.parentId) {
+        const parent = commentMap[comment.parentId.toString()];
+        if (parent) {
+            parent.replies.push(commentMap[comment._id]);
+        }
+        } else {
+        roots.push(commentMap[comment._id]);
+        }
+    });
+
+    return roots;
+}
+  
+export const getCommentsByPdfId =async (req, res, next) => {
     try {
         const { pdfId } = req.params;
         
@@ -14,27 +36,14 @@ export const getCommentsByPdfId = async (req, res, next) => {
             return next(new ApiError(404, "PDF not found"));
         }
         
-        
         if (req.user && pdf.uploadedBy.toString() !== req.user.id && !pdf.sharedWith.includes(req.user.id)) {
             return next(new ApiError(403, "Not authorized to access this PDF"));
         }
-        
+
         const comments = await Comment.find({ pdfId }).sort({ createdAt: 1 });
-        
-        const parentComments = comments.filter(comment => !comment.parentId);
-        const replies = comments.filter(comment => comment.parentId);
-        
-        const commentsWithReplies = parentComments.map(comment => {
-            const commentReplies = replies.filter(reply => 
-                reply.parentId && reply.parentId.toString() === comment._id.toString()
-            );
-        
-            return {
-                    ...comment.toObject(),
-                    replies: commentReplies
-            };
-        });
-        
+
+        const commentsWithReplies = buildCommentTree(comments);
+
         return res.status(200).json(
             new ApiResponse(
                 200,
@@ -46,8 +55,7 @@ export const getCommentsByPdfId = async (req, res, next) => {
         return next(new ApiError(500, "Error retrieving comments", [error.message]));
     }
 };
-
-
+  
 export const addComment = async (req, res, next) => {
   try {
     const { pdfId } = req.params;
@@ -184,9 +192,8 @@ export const deleteComment = async (req, res, next) => {
   }
 };
 
-
 export const getCommentsByShareLink = async (req, res, next) => {
-  try {
+    try {
         const { shareLink } = req.params;
         
         const pdf = await PDF.findOne({ shareLink });
@@ -196,19 +203,9 @@ export const getCommentsByShareLink = async (req, res, next) => {
         }
         
         const comments = await Comment.find({ pdfId: pdf._id }).sort({ createdAt: 1 });
-        
-        const parentComments = comments.filter(comment => !comment.parentId);
-        const replies = comments.filter(comment => comment.parentId);
-        
-        const commentsWithReplies = parentComments.map(comment => {
-            const commentReplies = replies.filter(reply => reply.parentId && reply.parentId.toString() === comment._id.toString());
-            
-            return {
-                ...comment.toObject(),
-                replies: commentReplies
-            };
-        });
-        
+
+        const commentsWithReplies = buildCommentTree(comments);
+
         return res.status(200).json(
             new ApiResponse(
                 200,
@@ -216,11 +213,11 @@ export const getCommentsByShareLink = async (req, res, next) => {
                 "Comments retrieved successfully"
             )
         );
-  } catch (error) {
+    } catch (error) {
         return next(new ApiError(500, "Error retrieving comments", [error.message]));
-  }
+    }
 };
-
+  
 
 export const addCommentByShareLink = async (req, res, next) => {
   try {
