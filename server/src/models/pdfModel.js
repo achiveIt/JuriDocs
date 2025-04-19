@@ -32,6 +32,11 @@ const pdfSchema = new mongoose.Schema({
         unique: true,
         sparse: true
     },
+    invitedEmails: [{
+        type: String,
+        lowercase: true,
+        trim: true
+      }],
     createdAt: {
         type: Date,
         default: Date.now

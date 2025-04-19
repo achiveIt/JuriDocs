@@ -1,14 +1,13 @@
 import express from 'express';
 import { protect } from '../middlewares/authMiddleware.js';
-import { generateShareLink } from '../controllers/sendInviteMail.js';
-import { getPDFByShareLink } from '../controllers/pdfController.js';
+import { generateShareLink , accessSharedPdf} from '../controllers/sendInviteMail.js';
 import { getCommentsByShareLink, addCommentByShareLink } from '../controllers/commentController.js';
 
 const router = express.Router();
 
 router.post('/:id', protect, generateShareLink);
 
-router.get('/:shareLink', getPDFByShareLink);
+router.get('/:shareLink', accessSharedPdf);
 
 router.get('/:shareLink/comments', getCommentsByShareLink);
 

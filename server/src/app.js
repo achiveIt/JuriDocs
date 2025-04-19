@@ -26,6 +26,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/pdf', pdfRoutes)
 app.use('/api/comment', commentRoutes)
 app.use('/api/shared', sharedRoutes)
-app.use('/api/mailInvite', sendInviteMailRoutes)
+app.use('/api/shared/invite', sendInviteMailRoutes)
 
 export {app}
