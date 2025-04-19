@@ -1,10 +1,17 @@
-import { useState } from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Login from './pages/Login.jsx';
+import Home from './pages/HomePage.jsx';
 import './App.css'
 
 function App() {
 
   return (
-   <h1 class="text-3xl font-bold underline">Hello</h1>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+      </Routes>
+  </Router>
   )
 }
 
