@@ -8,8 +8,6 @@ export default function CommentSection({ pdfId, shareLink }) {
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
 
-  console.log("sharelink present?", shareLink);
-  
   const fetchComments = async () => {
     try {
       const res = await fetch(
@@ -54,7 +52,6 @@ export default function CommentSection({ pdfId, shareLink }) {
           body: JSON.stringify(payload),
         }
       );
-      
       const data = await res.json();
       if (res.ok) {
         setText('');
@@ -67,6 +64,24 @@ export default function CommentSection({ pdfId, shareLink }) {
       console.error('Error posting comment:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const deleteComment = async (commentId) => {
+    try {
+      const res = await fetch(`${SERVER_URL}/api/comment/${commentId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        fetchComments();
+      } else {
+        alert(data.message || 'Failed to delete comment');
+      }
+    } catch (err) {
+      console.error('Error deleting comment:', err);
     }
   };
 
@@ -93,11 +108,18 @@ export default function CommentSection({ pdfId, shareLink }) {
           <p className="text-sm text-gray-700 mt-1 whitespace-pre-line">{comment.text}</p>
         </div>
 
-        <button
-          onClick={() => setReplyBoxOpen(!replyBoxOpen)}
-          className="text-sm text-blue-600 hover:underline" >
-          Reply
-        </button>
+        <div className="flex gap-4 text-sm">
+          <button
+            onClick={() => setReplyBoxOpen(!replyBoxOpen)}
+            className="text-blue-600 hover:underline" >
+            Reply
+          </button>
+          <button
+            onClick={() => deleteComment(comment._id)}
+            className="text-red-600 hover:underline">
+            Delete
+          </button>
+        </div>
 
         {replyBoxOpen && (
           <div className="mt-2">
