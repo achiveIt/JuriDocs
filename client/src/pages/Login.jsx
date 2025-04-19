@@ -39,39 +39,40 @@ export default function Login() {
     };
     
     return (
-        <form onSubmit={handleLogin} className="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
-        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-      
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="w-full px-4 py-2 mb-4 border rounded"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className="w-full px-4 py-2 mb-6 border rounded"
-        />
-      
-        <button
-          type="submit"
-          disabled={loading}
-          className={`bg-black text-white w-full py-3 rounded-lg font-semibold transition duration-300 ${
-            loading
-              ? 'bg-blue-400 text-white cursor-not-allowed'
-              : 'bg-blue-600 text-white hover:bg-blue-700'
-          }`}
-        >
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
-      
+        <div className="flex items-center justify-center min-h-screen bg-gray-50">
+            <form onSubmit={handleLogin} className="bg-white p-8 rounded shadow-md w-full max-w-md">
+                <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+                {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+
+                <input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="w-full px-4 py-2 mb-4 border rounded"
+                />
+                <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="w-full px-4 py-2 mb-6 border rounded"
+                />
+
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className={`w-full py-3 rounded-lg font-semibold transition duration-300 ${
+                        loading
+                            ? 'bg-blue-400 cursor-not-allowed'
+                            : 'bg-blue-600 hover:bg-blue-700 text-white'
+                    }`}
+                >
+                    {loading ? 'Logging in...' : 'Login'}
+                </button>
+            </form>
+        </div>
     );
 }
