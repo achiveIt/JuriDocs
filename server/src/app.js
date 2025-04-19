@@ -10,7 +10,7 @@ import sharedRoutes from './routes/sharedRoutes.js';
 const app = express();
 const corsOptions = {
     origin: 'http://localhost:5173',
-    methods: ['GET', 'POST', 'PUT', 'PATCH'], 
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], 
     credentials: true,               
   };
 
