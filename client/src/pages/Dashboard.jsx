@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { deletePDFById } from '../services/pdfService';
 import { SERVER_URL } from '../constants';
 
 export default function Dashboard() {
@@ -62,6 +63,20 @@ export default function Dashboard() {
     }
   };
 
+  const handleDelete = async (pdfId) => {
+    if (!window.confirm('Are you sure you want to delete this PDF?')) return;
+  
+    const result = await deletePDFById(pdfId);
+  
+    if (result.success) {
+      alert('PDF deleted successfully.');
+      setPdfs(prev => prev.filter(pdf => pdf._id !== pdfId));
+    } else {
+      alert(result.message || 'Error deleting PDF.');
+    }
+  };
+  
+
   const filteredPdfs = pdfs.filter(pdf =>
     pdf.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -91,12 +106,12 @@ export default function Dashboard() {
       </header>
 
       <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {filteredPdfs.map(pdf => (
-          <Link
-            to={`/pdf/${pdf._id}`}
-            key={pdf._id}
-            className="p-4 bg-white rounded-lg shadow hover:shadow-lg transition"
-          >
+      {filteredPdfs.map(pdf => (
+        <div
+          key={pdf._id}
+          className="p-4 bg-white rounded-lg shadow hover:shadow-lg transition flex flex-col justify-between"
+        >
+          <Link to={`/pdf/${pdf._id}`} className="flex-1">
             <div className="flex items-center justify-center h-32 bg-red-100 text-red-600 text-3xl font-bold rounded">
               PDF
             </div>
@@ -105,7 +120,15 @@ export default function Dashboard() {
               Uploaded: {new Date(pdf.createdAt).toLocaleDateString()}
             </p>
           </Link>
-        ))}
+
+          <button
+            onClick={() => handleDelete(pdf._id)}
+            className="mt-4 bg-red-600 text-white py-2 px-3 rounded hover:bg-red-700 transition"
+          >
+            Delete
+          </button>
+        </div>
+      ))}
       </div>
     </div>
   );
