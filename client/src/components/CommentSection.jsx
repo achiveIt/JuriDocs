@@ -1,18 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { SERVER_URL } from '../constants';
 
-export default function CommentSection({ pdfId }) {
+export default function CommentSection({ pdfId, shareLink }) {
   const [comments, setComments] = useState([]);
+  const [text, setText] = useState('');
   const [loading, setLoading] = useState(false);
+  const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
 
+  console.log("sharelink present?", shareLink);
+  
   const fetchComments = async () => {
     try {
-      const res = await fetch(`${SERVER_URL}/api/comment/${pdfId}`, {
-        credentials: 'include',
-      });
+      const res = await fetch(
+        shareLink
+          ? `${SERVER_URL}/api/shared/${shareLink}/comments`
+          : `${SERVER_URL}/api/comment/${pdfId}`,
+        {
+          credentials: 'include',
+        }
+      );
       const data = await res.json();
       if (res.ok) {
-        console.log('Fetched comments:', data.message.comments); 
         setComments(data.message.comments || []);
       } else {
         console.error('Error:', data.message);
@@ -24,22 +33,33 @@ export default function CommentSection({ pdfId }) {
 
   useEffect(() => {
     fetchComments();
-  }, [pdfId]);
+  }, [pdfId, shareLink]);
 
-  const submitComment = async (text, parentId = null, onSuccess) => {
-    if (!text.trim()) return;
+  const submitComment = async (commentText, parentId = null, onSuccess) => {
+    if (!commentText.trim()) return;
     setLoading(true);
     try {
-      const res = await fetch(`${SERVER_URL}/api/comment/${pdfId}`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, parentId }),
-      });
+      const payload = shareLink
+        ? { text: commentText, userName, userEmail, parentId }
+        : { text: commentText, parentId };
+
+      const res = await fetch(
+        shareLink
+          ? `${SERVER_URL}/api/shared/${shareLink}/comments`
+          : `${SERVER_URL}/api/comment/${pdfId}`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }
+      );
+      
       const data = await res.json();
       if (res.ok) {
-        fetchComments();
+        setText('');
         onSuccess?.();
+        fetchComments();
       } else {
         alert(data.message || 'Failed to post comment');
       }
@@ -111,12 +131,6 @@ export default function CommentSection({ pdfId }) {
     );
   };
 
-  const [newComment, setNewComment] = useState('');
-
-  const handleNewCommentSubmit = () => {
-    submitComment(newComment, null, () => setNewComment(''));
-  };
-
   return (
     <div className="mt-6 w-full">
       <h2 className="text-xl font-semibold mb-4">Comments</h2>
@@ -128,19 +142,35 @@ export default function CommentSection({ pdfId }) {
       </ul>
 
       <div className="mt-6">
+        {shareLink && (
+          <>
+            <input
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+              placeholder="Your Name"
+              className="w-full p-2 border rounded mb-2"/>
+            <input
+              value={userEmail}
+              onChange={(e) => setUserEmail(e.target.value)}
+              placeholder="Your Email"
+              className="w-full p-2 border rounded mb-2"
+            />
+          </>
+        )}
+
         <textarea
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
           rows="3"
           placeholder="Write a comment..."
-          className="w-full p-3 border rounded"/>
+          className="w-full p-3 border rounded" />
 
         <button
-          onClick={handleNewCommentSubmit}
+          onClick={() => submitComment(text)}
           disabled={loading}
           className={`mt-2 px-4 py-2 rounded text-white font-medium transition ${
             loading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-          }`} >
+          }`}>
           {loading ? 'Posting...' : 'Post Comment'}
         </button>
       </div>

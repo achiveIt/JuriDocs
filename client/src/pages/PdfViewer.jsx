@@ -1,22 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { SERVER_URL } from '../constants';
 import CommentSection from '../components/CommentSection';
 
 export default function PdfViewer() {
-  const { id } = useParams();
+  const { id, shareLink } = useParams();
+  const location = useLocation();
   const [pdf, setPdf] = useState(null);
+
+  const isShared = location.pathname.startsWith('/shared');
 
   useEffect(() => {
     const fetchPdf = async () => {
       try {
-        const res = await fetch(`${SERVER_URL}/api/pdf/${id}`, {
-          credentials: 'include',
+        const endpoint = isShared
+          ? `${SERVER_URL}/api/shared/${shareLink}`
+          : `${SERVER_URL}/api/pdf/${id}`;
+        
+        const res = await fetch(endpoint, {
+          credentials: isShared ? 'omit' : 'include',
         });
-        const data = await res.json();
 
+        const data = await res.json();
+        
         if (res.ok) {
-          setPdf(data);
+          setPdf(data.pdf || data);
         } else {
           console.error('Failed to load PDF:', data.message);
         }
@@ -26,7 +34,7 @@ export default function PdfViewer() {
     };
 
     fetchPdf();
-  }, [id]);
+  }, [id, shareLink, isShared]);
 
   if (!pdf) return <p className="p-8 text-center">Loading...</p>;
 
@@ -41,7 +49,7 @@ export default function PdfViewer() {
             className="w-full max-w-5xl h-[80vh] border rounded"/>
         </div>
         <div className="w-[400px] overflow-y-auto">
-          <CommentSection pdfId={id} />
+          <CommentSection pdfId={id} shareLink={shareLink}/>
         </div>
       </div>
     </div>
