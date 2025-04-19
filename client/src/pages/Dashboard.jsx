@@ -7,6 +7,7 @@ export default function Dashboard() {
   const [pdfs, setPdfs] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
+  const [shareLinks, setShareLinks] = useState({});
 
   const fetchPdfs = async () => {
     try {
@@ -65,9 +66,9 @@ export default function Dashboard() {
 
   const handleDelete = async (pdfId) => {
     if (!window.confirm('Are you sure you want to delete this PDF?')) return;
-  
+
     const result = await deletePDFById(pdfId);
-  
+
     if (result.success) {
       alert('PDF deleted successfully.');
       setPdfs(prev => prev.filter(pdf => pdf._id !== pdfId));
@@ -75,7 +76,28 @@ export default function Dashboard() {
       alert(result.message || 'Error deleting PDF.');
     }
   };
-  
+
+  const handleGenerateShareLink = async (pdfId) => {
+    try {
+      const res = await fetch(`${SERVER_URL}/api/pdf/${pdfId}/share`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        console.log("data: ", data);
+        
+        setShareLinks(prev => ({ ...prev, [pdfId]: data.shareUrl }));
+      } else {
+        alert(data.message || 'Failed to generate share link.');
+      }
+    } catch (error) {
+      console.error('Error generating share link:', error);
+      alert('Server error.');
+    }
+  };
 
   const filteredPdfs = pdfs.filter(pdf =>
     pdf.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -92,8 +114,7 @@ export default function Dashboard() {
               type="file"
               accept="application/pdf"
               onChange={handleUpload}
-              hidden
-            />
+              hidden/>
           </label>
         </div>
         <input
@@ -101,34 +122,50 @@ export default function Dashboard() {
           placeholder="Search PDFs..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full max-w-md mt-4 px-4 py-2 border rounded shadow-sm"
-        />
+          className="w-full max-w-md mt-4 px-4 py-2 border rounded shadow-sm"/>
       </header>
 
       <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-      {filteredPdfs.map(pdf => (
-        <div
-          key={pdf._id}
-          className="p-4 bg-white rounded-lg shadow hover:shadow-lg transition flex flex-col justify-between"
-        >
-          <Link to={`/pdf/${pdf._id}`} className="flex-1">
-            <div className="flex items-center justify-center h-32 bg-red-100 text-red-600 text-3xl font-bold rounded">
-              PDF
-            </div>
-            <h3 className="mt-4 font-semibold text-lg truncate">{pdf.title}</h3>
-            <p className="text-sm text-gray-500">
-              Uploaded: {new Date(pdf.createdAt).toLocaleDateString()}
-            </p>
-          </Link>
+        {filteredPdfs.map(pdf => (
+          <div
+            key={pdf._id}
+            className="p-4 bg-white rounded-lg shadow hover:shadow-lg transition flex flex-col justify-between" >
+            <Link to={`/pdf/${pdf._id}`} className="flex-1">
+              <div className="flex items-center justify-center h-32 bg-red-100 text-red-600 text-3xl font-bold rounded">
+                PDF
+              </div>
+              <h3 className="mt-4 font-semibold text-lg truncate">{pdf.title}</h3>
+              <p className="text-sm text-gray-500">
+                Uploaded: {new Date(pdf.createdAt).toLocaleDateString()}
+              </p>
+            </Link>
 
-          <button
-            onClick={() => handleDelete(pdf._id)}
-            className="mt-4 bg-red-600 text-white py-2 px-3 rounded hover:bg-red-700 transition"
-          >
-            Delete
-          </button>
-        </div>
-      ))}
+            <div className="mt-4 space-y-2">
+              <button
+                onClick={() => handleDelete(pdf._id)}
+                className="w-full bg-red-600 text-white py-2 px-3 rounded hover:bg-red-700 transition">
+                Delete
+              </button>
+
+              <button
+                onClick={() => handleGenerateShareLink(pdf._id)}
+                className="w-full bg-blue-600 text-white py-2 px-3 rounded hover:bg-blue-700 transition">
+                Generate Share Link
+              </button>
+
+              {shareLinks[pdf._id] && (
+                <div className="text-sm mt-2 break-all bg-gray-100 p-2 rounded text-blue-600">
+                  <a
+                    href={shareLinks[pdf._id]}
+                    target="_blank"
+                    rel="noopener noreferrer" >
+                    {shareLinks[pdf._id]}
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

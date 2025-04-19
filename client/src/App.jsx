@@ -16,6 +16,7 @@ function App() {
         <Route path='/signup' element={<Signup />} />
         <Route path='/dashboard' element = {<Dashboard/ >} />
         <Route path="/pdf/:id" element={<PdfViewer />} />
+        <Route path="/shared/:shareLink" element={<PdfViewer />} />
       </Routes>
   </Router>
   )
