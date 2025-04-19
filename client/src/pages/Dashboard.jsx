@@ -8,6 +8,11 @@ export default function Dashboard() {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   const [shareLinks, setShareLinks] = useState({});
+  const [selectedPdfId, setSelectedPdfId] = useState(null);
+  const [showModel, setshowModel] = useState(false);
+  const [emailInput, setEmailInput] = useState('');
+  const [emails, setEmails] = useState([]);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const fetchPdfs = async () => {
     try {
@@ -77,25 +82,74 @@ export default function Dashboard() {
     }
   };
 
-  const handleGenerateShareLink = async (pdfId) => {
+  const openShareModel = (pdfId) => {
+    setSelectedPdfId(pdfId);
+    setshowModel(true);
+    setEmails([]);
+    setEmailInput('');
+  };
+
+  const handleSendEmailInvite = async () => {
+    try {
+      addEmail();
+      const res = await fetch(`${SERVER_URL}/api/shared/invite/${selectedPdfId}`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emails }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        console.log(data);
+        
+        setShareLinks(prev => ({ ...prev, [selectedPdfId]: data.shareUrl }));
+        setshowModel(false);
+        setSuccessMessage('Invitation email sent successfully!');
+        setTimeout(() => setSuccessMessage(''), 3000);
+      } else {
+        alert(data.message || 'Failed to send email invites.');
+      }
+    } catch (error) {
+      console.error('Error sending invites:', error);
+      alert('Server error.');
+    }
+  };
+
+  const handleGenerateOnlyLink = async (pdfId) => {
     try {
       const res = await fetch(`${SERVER_URL}/api/pdf/${pdfId}/share`, {
         method: 'POST',
         credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emails: [] }),
       });
-
       const data = await res.json();
-
       if (res.ok) {
-        console.log("data: ", data);
-        
         setShareLinks(prev => ({ ...prev, [pdfId]: data.shareUrl }));
+        setshowModel(false);
       } else {
         alert(data.message || 'Failed to generate share link.');
       }
     } catch (error) {
       console.error('Error generating share link:', error);
       alert('Server error.');
+    }
+  };
+
+  const addEmail = () => {
+    console.log("email input, ", emailInput);
+    
+    const trimmed = emailInput.trim();
+    console.log("Current emails:", emails);
+    console.log("Adding email:", trimmed);
+    
+    if (trimmed && !emails.includes(trimmed)) {
+      setEmails(prevEmails => {
+        const newEmails = [...prevEmails, trimmed];
+        console.log("New emails array:", newEmails);
+        return newEmails;
+      });
+      setEmailInput('');
     }
   };
 
@@ -124,7 +178,11 @@ export default function Dashboard() {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full max-w-md mt-4 px-4 py-2 border rounded shadow-sm"/>
       </header>
-
+      {successMessage && (
+        <div className="mb-4 p-4 bg-green-100 text-green-800 border border-green-300 rounded">
+          {successMessage}
+        </div>
+      )}
       <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {filteredPdfs.map(pdf => (
           <div
@@ -148,9 +206,25 @@ export default function Dashboard() {
               </button>
 
               <button
-                onClick={() => handleGenerateShareLink(pdf._id)}
+                onClick={() => {
+                  if (shareLinks[pdf._id]) {
+                    setShareLinks(prev => {
+                      const updated = { ...prev };
+                      delete updated[pdf._id];
+                      return updated;
+                    });
+                  } else {
+                    handleGenerateOnlyLink(pdf._id);
+                  }
+                }}
+                className="w-full bg-green-600 text-white py-2 px-3 rounded hover:bg-green-700 transition">
+                 Generate Share Link
+              </button>
+
+              <button
+                onClick={() => openShareModel(pdf._id)}
                 className="w-full bg-blue-600 text-white py-2 px-3 rounded hover:bg-blue-700 transition">
-                Generate Share Link
+                Send invite via mail
               </button>
 
               {shareLinks[pdf._id] && (
@@ -167,6 +241,45 @@ export default function Dashboard() {
           </div>
         ))}
       </div>
+
+      {showModel && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+            <h3 className="text-xl font-semibold mb-4">Invite via Email</h3>
+            <div className="flex mb-2">
+              <input
+                type="email"
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+                placeholder="Enter email"
+                className="flex-1 border px-3 py-2 rounded-l" />
+              <button type="button" onClick={() => addEmail()} className="bg-blue-600 text-white px-4 rounded-r hover:bg-blue-700">
+                Add
+              </button>
+            </div>
+            {emails.length > 0 && (
+              <div className="mb-4 text-sm">
+                <p className="mb-1 font-semibold">Inviting:</p>
+                <ul className="list-disc list-inside text-gray-700">
+                  {emails.map((email, i) => <li key={i}>{email}</li>)}
+                </ul>
+              </div>
+            )}
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setshowModel(false)}
+                className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400">
+                Cancel
+              </button>
+              <button
+                onClick={handleSendEmailInvite}
+                className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700">
+                Send Invite
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
