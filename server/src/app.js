@@ -6,6 +6,7 @@ import commentRoutes from './routes/commentRoutes.js'
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import sharedRoutes from './routes/sharedRoutes.js';
+import sendInviteMailRoutes from './routes/sendInviteMailRoute.js';
 
 const app = express();
 const corsOptions = {
@@ -25,5 +26,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/pdf', pdfRoutes)
 app.use('/api/comment', commentRoutes)
 app.use('/api/shared', sharedRoutes)
+app.use('/api/mailInvite', sendInviteMailRoutes)
 
 export {app}
