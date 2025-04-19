@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { SERVER_URL } from '../constants';
+import CommentSection from '../components/CommentSection';
 
 export default function PdfViewer() {
   const { id } = useParams();
@@ -32,11 +33,17 @@ export default function PdfViewer() {
   return (
     <div className="min-h-screen p-8 bg-gray-100 flex flex-col items-center">
       <h1 className="text-2xl font-bold mb-4">{pdf.title}</h1>
-      <iframe
-        src={pdf.url}
-        title={pdf.title}
-        className="w-full max-w-5xl h-[80vh] border rounded"
-      />
+      <div className="w-full max-w-[1400px] flex gap-6">
+        <div className="flex-1">
+        <iframe
+            src={pdf.url}
+            title={pdf.title}
+            className="w-full max-w-5xl h-[80vh] border rounded"/>
+        </div>
+        <div className="w-[400px] overflow-y-auto">
+          <CommentSection pdfId={id} />
+        </div>
+      </div>
     </div>
   );
 }
