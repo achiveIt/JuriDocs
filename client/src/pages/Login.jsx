@@ -73,6 +73,11 @@ export default function Login() {
                     }`}>
                     {loading ? 'Logging in...' : 'Login'}
                 </button>
+                <button
+                    onClick={() => {navigate('/'); window.location.reload();}}
+                    className="mt-4 text-sm text-blue-600 hover:underline">
+                    Back to Home
+                </button>
             </form>
         </div>
     );
