@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { PDF } from '../models/pdfModel.js';
-import sendInvitationEmails from '../utils/sendMail.js';
+import { sendInvitationEmails } from '../utils/sendMail.js';
 
 export const generateShareLink = async (req, res) => {
   try {
