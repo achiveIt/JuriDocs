@@ -3,7 +3,7 @@
 **JuriDocs** is a platform that allows users to upload, manage, share, and comment on PDF documents in a secure and collaborative way.
 
 ## Video showcasing project features
-![Click here to watch the demo](./images/project_vdo.mp4)
+[https://drive.google.com/file/d/158V17YL3wdhFJOmSEyhhNWm1BdhXnnEW/view?pli=1](Project Demo Link)
 
 ## Tech Stack
 
