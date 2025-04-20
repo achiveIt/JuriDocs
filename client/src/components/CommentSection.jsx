@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
+import { Editor } from '@tinymce/tinymce-react';
 import { SERVER_URL } from '../constants';
 
 export default function CommentSection({ pdfId, shareLink }) {
   const [comments, setComments] = useState([]);
-  const [text, setText] = useState('');
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
+  const [text, setText] = useState('');
+  const TINY_MCE_API_KEY = import.meta.env.VITE_TINY_MCE_API_KEY; 
 
   const fetchComments = async () => {
     try {
@@ -105,7 +107,7 @@ export default function CommentSection({ pdfId, shareLink }) {
               {new Date(comment.createdAt).toLocaleString()}
             </span>
           </div>
-          <p className="text-sm text-gray-700 mt-1 whitespace-pre-line">{comment.text}</p>
+          <p className="text-sm text-gray-700 mt-1 whitespace-pre-line" dangerouslySetInnerHTML={{ __html: comment.text }}></p>
         </div>
 
         <div className="flex gap-4 text-sm">
@@ -123,12 +125,16 @@ export default function CommentSection({ pdfId, shareLink }) {
 
         {replyBoxOpen && (
           <div className="mt-2">
-            <textarea
+            <Editor
+              apiKey={TINY_MCE_API_KEY}
               value={replyText}
-              onChange={(e) => setReplyText(e.target.value)}
-              rows="2"
-              className="w-full p-2 border rounded mt-2"
-              placeholder="Write a reply..."/>
+              init={{
+                height: 150,
+                menubar: false,
+                plugins: 'lists link',
+                toolbar: 'bold italic | bullist',
+              }}
+              onEditorChange={(content) => setReplyText(content)}/>
             <button
               onClick={handleReply}
               disabled={loading}
@@ -179,14 +185,16 @@ export default function CommentSection({ pdfId, shareLink }) {
             />
           </>
         )}
-
-        <textarea
+        <Editor
+          apiKey={TINY_MCE_API_KEY}
           value={text}
-          onChange={(e) => setText(e.target.value)}
-          rows="3"
-          placeholder="Write a comment..."
-          className="w-full p-3 border rounded" />
-
+          init={{
+            height: 200,
+            menubar: false,
+            plugins: 'lists link',
+            toolbar: 'bold italic | bullist',
+          }}
+          onEditorChange={(content) => setText(content)}/>
         <button
           onClick={() => submitComment(text)}
           disabled={loading}
