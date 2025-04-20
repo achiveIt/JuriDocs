@@ -89,6 +89,11 @@ export default function Signup() {
         >
           {loading ? 'Creating account...' : 'Sign Up'}
         </button>
+        <button
+          onClick={() => navigate('/')}
+          className="mt-4 text-sm text-blue-600 hover:underline">
+          Back to Home
+        </button>
       </form>
     </div>
   );
