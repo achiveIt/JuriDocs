@@ -2,6 +2,9 @@
 
 **JuriDocs** is a platform that allows users to upload, manage, share, and comment on PDF documents in a secure and collaborative way.
 
+## Video showcasing project features
+![Click here to watch the demo](./images/project_vdo.mp4)
+
 ## Tech Stack
 
 - **Frontend**: React, Tailwind, redux-tool kit
@@ -93,6 +96,9 @@ npm run dev
 - Invitation emails are sent with a secure access link.
 - Invited links do not require authentication to access.
 - Only invited email addresses can access the file via link.
+
+Note: User must click on **Add** button to add email in the list of emails who will recieve the share link.
+![Email Invite](./images/inviteViaEmail.jpeg)
 
 ### Commenting System
 - Authenticated users can comment on any PDF they own.
