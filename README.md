@@ -70,7 +70,7 @@ npm run dev
 - The password is hashed (bycryptjs) before saving to db to ensure security.
 - User sign up and login functionality with cookie-based sessions.
 - Protected routes for authenticated access (dashboard, uploading, etc).
-![Home Page](../JuriDocs/images/loginSignUp.jpeg)
+![Home Page](./images/loginSignUp.jpeg)
 
 
 ### Password Reset and Account Recovery
