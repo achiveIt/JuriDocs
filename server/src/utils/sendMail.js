@@ -45,4 +45,28 @@ export const sendInvitationEmails = async ({ emails, shareUrl, pdfTitle }) => {
   return { sentTo, failed };
 };
 
-export default sendInvitationEmails;
+export const sendResetPasswordEmail = async (email, resetLink) => {
+  const mailOptions = {
+    from: `"JuriDocs" <${process.env.MAIL_USER}>`,
+    to: email,
+    subject: 'Reset Your JuriDocs Password',
+    html: `
+      <p>Hello,</p>
+      <p>You requested to reset your JuriDocs password.</p>
+      <p>Click the link below to reset it. This link will expire in 10 minutes.</p>
+      <p><a href="${resetLink}" target="_blank">${resetLink}</a></p>
+      <br>
+      <p>If you didn't request this, please ignore this email.</p>
+      <br>
+      <p>— JuriDocs</p>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Reset password email sent to: ${email}`);
+  } catch (error) {
+    console.error(`Failed to send reset email to ${email}:`, error.message);
+    throw new Error('Failed to send reset email.');
+  }
+};
