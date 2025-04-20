@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { SERVER_URL } from '../constants';
 
 export default function Login() {
@@ -50,17 +50,19 @@ export default function Login() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="w-full px-4 py-2 mb-4 border rounded"
-                />
+                    className="w-full px-4 py-2 mb-4 border rounded"/>
                 <input
                     type="password"
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="w-full px-4 py-2 mb-6 border rounded"
-                />
-
+                    className="w-full px-4 py-2 mb-6 border rounded"/>
+                <div className="text-right mb-4">
+                <Link to="/forgot-password" className="text-sm text-blue-600 hover:underline">
+                    Forgot Password?
+                </Link>
+                </div>
                 <button
                     type="submit"
                     disabled={loading}
@@ -68,8 +70,7 @@ export default function Login() {
                         loading
                             ? 'bg-blue-400 cursor-not-allowed'
                             : 'bg-blue-600 hover:bg-blue-700 text-white'
-                    }`}
-                >
+                    }`}>
                     {loading ? 'Logging in...' : 'Login'}
                 </button>
             </form>
