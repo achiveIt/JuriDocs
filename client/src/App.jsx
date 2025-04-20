@@ -5,6 +5,8 @@ import Signup from './pages/SignUpPage.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import PdfViewer from './pages/PdfViewer.jsx'; 
 import SharedPDFView from './pages/InvitedPdf.jsx';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import './App.css'
 
 function App() {
@@ -19,6 +21,8 @@ function App() {
         <Route path="/pdf/:id" element={<PdfViewer />} />
         <Route path="/shared/:shareLink" element={<PdfViewer />} />
         <Route path='shared/invite/:shareLink' element= {<SharedPDFView/>} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
   </Router>
   )
