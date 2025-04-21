@@ -86,7 +86,7 @@ npm run dev
 
 ### Password Reset and Account Recovery
 - User can reset their password by clicking on changePassword button.
-- User can also recover their account in case of forgetting password. They need to enter the email accosiated with JuriDocs and a account recovery mail will be send to them.
+- User can also recover their account in case of forgetting password. They need to enter the email associated with JuriDocs and a account recovery mail will be send to them.
 - Secure reset link expires after 10 minutes.
 
 ### PDF Management
