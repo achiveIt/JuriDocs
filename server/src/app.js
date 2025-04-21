@@ -10,7 +10,7 @@ import sendInviteMailRoutes from './routes/sendInviteMailRoute.js';
 
 const app = express();
 const corsOptions = {
-    origin: 'http://localhost:5173',
+    origin: 'https://juri-docs.vercel.app',
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], 
     credentials: true,               
   };
