@@ -5,6 +5,14 @@
 ## Video showcasing project features
 [Project Demo Link](https://drive.google.com/file/d/158V17YL3wdhFJOmSEyhhNWm1BdhXnnEW/view?pli=1)
 
+## Deployment
+- **Frontend**: Vercel
+- **Backend**: Render
+
+## Live Project
+[Live Project Link](https://juri-docs.vercel.app/)
+
+
 ## Tech Stack
 
 - **Frontend**: React, Tailwind, redux-tool kit
@@ -99,6 +107,7 @@ npm run dev
 
 Note: User must click on **Add** button to add email in the list of emails who will recieve the share link.
 ![Email Invite](./images/inviteViaEmail.jpeg)
+It may take couple of minutes to recieve an email, please also check your spam folder.
 
 ### Commenting System
 - Authenticated users can comment on any PDF they own.
@@ -115,4 +124,4 @@ Note: User must click on **Add** button to add email in the list of emails who w
 
 
 ### Name: Shivdutt Pachori
-### Email: shivduttchori7@gmail.com
+### Email: shivduttpachori7@gmail.com
